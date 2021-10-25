@@ -17,10 +17,10 @@ SkewKurtosis = function(Y, Skew.Formula="G1"){
     "Kurtosis"= (sum(((Y-Ybar)^4)/N, na.rm=TRUE)/s^4)-3 ))
 }
 
-##QQplots <- needs work as a function  
-QQplots = function(Data, folder="QQplots/"){
+##QQplots 
+QQplots = function(Data, folder="QQplots/", fileprefix=""){
 for(VarName in names(Data)){
-jpeg(paste0(folder,DataObj,"_",VarName,".jpg"))
+jpeg(paste0(folder,fileprefix,VarName,".jpg"))
   qqnorm(Data[,VarName], pch=1, frame = FALSE)
   qqline(Data[,VarName], col="green", lwd = 2)
 dev.off()}}
