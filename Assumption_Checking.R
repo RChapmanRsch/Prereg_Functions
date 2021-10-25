@@ -20,7 +20,7 @@ SkewKurtosis = function(Y, Skew.Formula="G1"){
 ##QQplots <- needs work as a function  
 QQplots = function(Data, folder="QQplots/"){
 for(VarName in names(Data)){
-jpeg(paste0(folders,DataObj,"_",VarName,".jpg"))
+jpeg(paste0(folder,DataObj,"_",VarName,".jpg"))
   qqnorm(Data[,VarName], pch=1, frame = FALSE)
   qqline(Data[,VarName], col="green", lwd = 2)
 dev.off()}}
