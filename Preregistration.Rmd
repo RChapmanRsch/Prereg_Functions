@@ -1,0 +1,33 @@
+---
+title: "PDR Clothing and Item Response Theory"
+subtitle: "Preregistration"
+author: "Robert Chapman"
+date: "10/27/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+*Below are 10 questions to be included with the pre-registration form for secondary data analyses as recommended by [Mertens & Krypotos 2019](https://psycnet.apa.org/doi/10.1037/abn0000424)*
+
+## What is the hypothesis that will be investigated?
+
+## How will the crucial variables by operationalized?
+
+## What is the source of data included on the analyses?
+
+## How will this data be obtained?
+
+## Are there any exclusion criteria for the data?
+
+## What are the planned statistical analyses?
+
+## What are the criteria for confirming and disconfirming the hypotheses?
+
+## Have the analyses been validated on a subset of the data?
+
+## What is known about the data that could be relevant for the tested hypotheses?
+
+## Please provide a brief timeline for the different steps in the preregistration?
