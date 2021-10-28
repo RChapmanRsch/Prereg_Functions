@@ -1,34 +1,3 @@
-#Script to turn a SAS or SPSS Codebook saved as .csv (via excel)
-#into an R 'codebook' list with variable description, values and labels,
-
-#read in the .csv, making sure that data isn't pulled into the header, empty cells are "NA" and character only 
-Codebook_raw = read.csv("data/FKSI Gen Pop Codebook.csv", header=FALSE, colClasses="character", na.strings="")
-
-#extract a list of variables names from the first column the codebook
-Var_names=Codebook_raw[which(Codebook_raw[,1]!="Standard Attributes" & Codebook_raw[,1]!="Valid Values" & Codebook_raw[,1]!="Labeled Values" & !is.na(Codebook_raw[,1])),1]
-
-#Create a 'codebook' list of variables, cycling through variable names
-Codebook_list=sapply(Var_names, simplify=FALSE, function(Var_name){
-  #pick out first response option under 'values' column below each variable's row
-  #Future: instead of hardcoding, could do a 'grep' or 'while()' for first row which == "Values" or "Label" 
-  first_response_option=which(Codebook_raw[,1]==Var_name)+3
-  #create a new 'last_response_option' var, and cycle through response option until next row is NA (i.e., last)
-  last_response_option=first_response_option
-  while(!is.na(Codebook_raw[last_response_option+1,2])){last_response_option=last_response_option+1}
-  
-  #List autonamed for the variable we're looking at (see usenames=TRUE above)
-  #Future coding: could make this into just 1 vector, with named values, named as description
-  list(
-    "Description"=Codebook_raw[which(Codebook_raw[,1]==Var_name)+2,3], #Description labelled values
-    "Value"=as.numeric(Codebook_raw[first_response_option:last_response_option,2]), #List of Values
-    "Labelled"=Codebook_raw[first_response_option:last_response_option,3]) #List of Labelled Values
-  })
-
-#save out the codebook_list in RDS format
-saveRDS(Codebook_list, "data/Codebook_list.RDS")
-
-#####################
-
 #Script to generate codebook from original data dictionary for clothing IRT project
 
 #Codebook_list is a list object with this structure: 
