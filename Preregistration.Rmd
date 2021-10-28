@@ -103,8 +103,6 @@ In sample 2, the same inclusion/exclusion criteria were used, with the addition 
       - *psych package: fa.parallel()*
     + ICLUST
       - *psych package: ICLUST()*
-    + Omega hierarchical & omega total
-      - *psych package: omega()*
     + Bi-factor modeling
       - *psych package: omega()*  
   
@@ -113,14 +111,15 @@ In sample 2, the same inclusion/exclusion criteria were used, with the addition 
 2. IRT Assumption Checks  
 	*Will need to be further fleshed out for which model is selected*
     + Monotonicity (*if rasch, assumed – what about for 2pl?*)
-      - Unidimensionality 
-        + *see dimensionality section above*
+      - Unidimensionality
+        + Omega hierarchical/total & Explained Common Variance
+          - *psych package: omega()*
       - Local dependence 
         + *if 2pl, jackknife slope index – what about for rasch?*
       - Item invariance
         + *DIF, logistic ordinal regression for 2pl – what about for rasch?*
     
-3. IRT modelling
+3. IRT Modeling
     + Model selection 
       - Rasch/mixture rasch/2pl/multidimensional 
         - *psych package: rasch(), ltm() & mixrasch package* 
