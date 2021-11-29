@@ -2,7 +2,7 @@
 title: "PDR Clothing and Item Response Theory"
 subtitle: "Preregistration"
 author: "Robert Chapman"
-date: "10/27/2021"
+date: "11/28/2021"
 output: word_document
 ---
 
@@ -20,7 +20,7 @@ For the purpose of further evaluating and comparing the scale/item set of Painfu
 **Hypotheses:**  
   
 1. There is either a unidimensional or multidimensional construct of ‘discomfort for appearance’ as measured by the PDR clothing items?  
-2. An Item Response Theory model may be fit to the PDR clothing item data, and will allow further evaluation and comparison of PDR clothing items in relation to the central construct of ‘discomfort for appearance’.
+2. An Item Response Theory model may be fit to the PDR clothing item data, and will allow further evaluation and comparison of PDR clothing items in relation to the central construct of ‘discomfort/distraction for appearance’.
 
 ## How will the crucial variables by operationalized?
   
@@ -92,7 +92,7 @@ In sample 2, the same inclusion/exclusion criteria were used, with the addition 
     + Mean, Median, Standard Deviation, Frequency, Range
       - *Base R: mean(), median(), sd(), table(), range())*
     + Correlation matrix 
-      - *psych package: polychoric()*
+      - *psych package: tetrachoric()*
     + Standardized Cronbach’s Alpha
       - *psych package: alpha()*    
 
@@ -110,19 +110,31 @@ In sample 2, the same inclusion/exclusion criteria were used, with the addition 
   
 2. IRT Assumption Checks  
 	*Will need to be further fleshed out for which model is selected*
-    + Monotonicity (*if rasch, assumed – what about for 2pl?*)
+    + Monotonicity
+          - *assumed for dichotomous data*
       - Unidimensionality
         + Omega hierarchical/total & Explained Common Variance
           - *psych package: omega()*
       - Local dependence 
-        + *if 2pl, jackknife slope index – what about for rasch?*
-      - Item invariance
-        + *DIF, logistic ordinal regression for 2pl – what about for rasch?*
-    
+        + *Rasch: Q3*
+        + *2pl: jackknife slope index – Q3  for rasch*
+      - Item invariance (DIF)
+        + *Rasch: Mantel-Haenszel*
+        + *2PL: logistic ordinal regression for 2pl?*
 3. IRT Modeling
-    + Model selection 
-      - Rasch/mixture rasch/2pl/multidimensional 
-        - *psych package: rasch(), ltm() & mixrasch package* 
+    + Models to be evaluated: 
+      - Rasch 
+        - *psych package: rasch()* 
+      - Rasch w/guessing 
+        - *???psych package: rasch()* 
+      - 2PL 
+        - *psych package: ltm()* 
+      - Multidimensional IRT 
+        - *mirt package: mirt()* 
+      - IRTree Modeling 
+        - *???? package: ???()* 
+      - Explanatory IRT Modeling 
+        - *???? package: ???()* 
     + Model fit
       - Goodness of fit/deviance 
         - *Package: AIC,BIC, Chi-Sq?*
@@ -133,27 +145,26 @@ In sample 2, the same inclusion/exclusion criteria were used, with the addition 
 ## What are the criteria for confirming and disconfirming the hypotheses?
   
 ### Hypothesis 1  
-There is either a unidimensional or multidimensional construct of ‘discomfort for appearance’ as measured by the PDR clothing items?  
+There is either a unidimensional or multidimensional construct of ‘discomfort/distraction for appearance’ as measured by the PDR clothing items?  
   
 **Confirming**  
-There is additional literature supporting a construct of ‘discomfort for appearance’ as indicated by wearing PDR clothing
-Scree plots, ICLUST and Bifactor analyses indicate a reasonable number of factors (1 to 5) in the PDR clothing set
+1. There is additional literature supporting a construct of ‘discomfort/distraction for appearance’ as indicated by wearing PDR clothing.  
+2. Scree plots, ICLUST and Bifactor analyses indicate a reasonable number of factors (1 to 5) in the PDR clothing set
   
 **Disconfirming**  
-There is additional literature contradicting a construct of ‘discomfort for appearance’ as indicated by wearing PDR clothing
-Scree plots, ICLUST and Bifactor analyses indicate an unreasonable or untestable number of factors (e.g., 6+) in the PDR clothing set
+1. There is additional literature contradicting a construct of ‘discomfort/distraction for appearance’ as indicated by wearing PDR clothing.  
+2. Scree plots, ICLUST and Bifactor analyses indicate an unreasonable or untestable number of factors (e.g., 6+) in the PDR clothing set
   
 ### Hypothesis 2  
-An Item Response Theory model may be fit to the PDR clothing item data, and will allow further evaluation and comparison of PDR clothing items in relation to the central construct of ‘discomfort for appearance’.  
+An Item Response Theory model can be fit to the dimensions in the PDR clothing item data, and will allow further evaluation and comparison of PDR clothing items in relation to the central construct(s) of ‘discomfort/distraction for appearance’.  
   
 **Confirming**  
-Model Assumptions will be met for each IRT model to be fit, including monotonicity, local dependence and item invariance
-Goodness of fit indices for the model is appropriate (e.g., CFI/TLI >0.95, RMSEA <0.08) and for item fit (e.g., non-significant signed chi-square)  
+1. Model assumptions will be met for each IRT model to be fit, including monotonicity, local dependence and item invariance  
+2. Goodness of fit indices for the model is appropriate (e.g., CFI/TLI >0.95, RMSEA <0.08) and for item fit (e.g., non-significant signed chi-square)  
   
 **Disconfirming**  
-Model Assumptions will are not met for each IRT model to be fit, including monotonicity, local dependence and item invariance
-Goodness of fit indices for the model are not appropriate (e.g., CFI/TLI >0.95, RMSEA <0.08) and item fit (e.g., significant signed chi-square)  
-  
+1. Model Assumptions will are not met for each IRT model to be fit, including monotonicity, local dependence and item invariance  
+2. Goodness of fit indices for the model are not appropriate (e.g., CFI/TLI <0.95, RMSEA >0.08) and item fit (e.g., significant signed chi-square)  
 
 ## Have the analyses been validated on a subset of the data?
 
