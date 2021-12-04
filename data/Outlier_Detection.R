@@ -14,3 +14,11 @@ for(VarName in names(Data)){
 jpeg(paste0(folder,fileprefix,VarName,".jpg"))
 boxplot(Data[,VarName])
 dev.off()}}
+
+# Barplots
+Barplots=function(Data, folder="Barplots/", fileprefix=""){
+for(VarName in names(Data)){
+jpeg(paste0(folder,fileprefix,VarName,".jpg"))
+barplot(table(Data[,1]), main=names(Data)[1], ylab="count")
+dev.off()}}
+
