@@ -2,7 +2,8 @@
 title: "PDR Clothing and Item Response Theory"
 subtitle: "Preregistration"
 author: "Robert Chapman"
-date: "10/27/2021"
+date: "12/04/2021"
+
 output: word_document
 ---
 
@@ -14,20 +15,299 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## What is the hypothesis that will be investigated?
 
-## How will the crucial variables by operationalized?
+**Research Question:**  
+For the purpose of further evaluating and comparing the scale/item set of Painful, Distracting and Restrictive (PDR) clothing in [Engeln & Zola 2021](https://doi.org/10.1007/s11199-021-01230-9): what is the dimensionality and appropriateness of fitting of an Item Response Theory model to PDR clothing items representing ‘discomfort for appearance’
 
+**Hypotheses:**  
+  
+1. There is either a unidimensional or multidimensional construct of ‘discomfort for appearance’ as measured by the PDR clothing items?  
+2. An Item Response Theory model may be fit to the PDR clothing item data, and will allow further evaluation and comparison of PDR clothing items in relation to the central construct of ‘discomfort/distraction for appearance’.
+
+## How will the crucial variables by operationalized?
+  
+1. Variables representing clothing choices, as presented and tested in the article (https://osf.io/ajv5z/)
+2. Demographic variables:
+   + Gender
+  
 ## What is the source of data included on the analyses?
+
+**Two samples:**  
+  
+1. Online Qualtrics survey of undergraduate men and women through social media platforms (e.g., Facebook, Reddit)  
+2. Online survey via Mechanical Turk  
+
+**Source of Data**  
+Openly accessible data, published by the authors, here: (https://osf.io/ajv5z/)
 
 ## How will this data be obtained?
 
+Data will be obtained from the OSF repository, (https://osf.io/ajv5z/)	
+
 ## Are there any exclusion criteria for the data?
 
-## What are the planned statistical analyses?
+In sample 1, persons were included in the analysis set if they were undergraduates who self-reported cisgender identity of male or female. Persons were excluded if they did not self-report cisgender identity of male or female.  
+  
+In sample 2, the same inclusion/exclusion criteria were used, with the addition of exclusions from the analysis set for inattentiveness (via in-survey attention checks).  
 
+**Data will be excluded from analyses if they**   
+  
+* cause a violation of assumptions in the statistical analysis
+  + e.g., a single case exerts enough leverage/influence to cause a violation in normality
+* represent an outlier (defined as > 3.29 Z-score)
+* can be reasonably justified to be not a part of the population
+* If they are missing a problematic amount of data
+  + e.g., case is missing >50% of observations or statistical modeling requires complete data  
+  
+## What are the planned statistical analyses?
+  
+**Set-up & Hypothesis Building**  
+  
+1. Additional literature review (part of prereg)
+2. Additional Hypothesis building (part of prereg)
+3. Initial coding and scripting with simulated data from codebook & sample size 
+  
+**Data Prep and Description**  
+```{r Codebook_Loading_and_Sim_Prep,eval=FALSE, echo=FALSE}
+source("data/Generate_Codebook.R")
+
+#read in Codebook and set sample size for sim data
+Codebook=readRDS("data/Codebook_list.RDS")
+SampleSize=797 #required for simulation
+
+#Codebook is a list object with this structure: 
+#"Description" - string of description of the variable
+#"Value" - vector of numeric values for the data, e.g., 1-5
+#"Labelled" - vector of labelled response options, e.g., "never", "sometimes", "always"
+
+#create dataframe of sim data from SampleSize (above) and number of variable codebook
+Data=data.frame(matrix(NA, nrow=SampleSize, ncol=length(Codebook)))
+names(Data)=names(Codebook)
+
+#Create Sim data based on "values" in codebook list for each variables
+for(Var in names(Data)){
+  if(!all(is.na(Codebook[[Var]]$Value))){
+    Data[,Var]=sample(Codebook[[Var]]$Value,SampleSize,replace = TRUE)
+    if(Var=="sample"){Data[,Var]=1;Data[sample(1:SampleSize,252),Var]=2}} #match sample sources n's
+  else {Data[,Var]=sample(1:100, SampleSize, replace = TRUE)}
+}
+
+```
+1. Data Processing and Cleaning
+    + Visual inspection of data for clear errors or empty rows/columns
+      - *Base R: View()*
+```{r View_Data, eval=FALSE, echo=FALSE} 
+View(Data)
+```
+    + Checking that variables are correctly formatted 
+      - *Base R: class()*
+```{r Check_Classes, eval=FALSE, echo=FALSE}
+  ###Are all items and response formatted correctly - e.g., numeric v factor v value labels
+  sapply(Data, class) #need to manually review for factor and labels, etc.
+```
+    + Cross-check data variables with data dictionary
+      - *Base R: names(Data) %in%  names(Codebook)*
+```{r Names_Check, eval=FALSE, echo=FALSE}
+  ###Are all items present?
+  if(any(!(names(Data) %in% names(Codebook)))){
+    print(paste("names in Data, but not in Codebook:",names(Data)[which(!(names(Data) %in% names(Codebook)))]))
+    print(paste("names in Codebook, but not in Data:",names(Codebook)[which(!(names(Codebook) %in% names(Data)))]))
+  }else{print("All names in Data and Codebook match")}
+```
+    + Checking that variables meet expected range/values
+      - *Base R: unique(Data[,var]) %in% Codebook[Var]$Values*
+```{r ExpectedRangesValues, eval=FALSE, echo=FALSE}
+#Out of Range values 
+  sapply(names(Codebook), function(Var){
+    if(!all(is.na(Codebook[[Var]]$Value))){
+      unique(Data[,Var])[!(unique(Data[,Var]) %in% Codebook[[Var]]$Value)]}})
+```
+    + Visualization
+      - *Base R: Boxplots(), pairs()*  
+```{r PlotPairs, eval=FALSE, echo=FALSE}
+#reducing for the variables used in analysis
+PDRitems=names(Data)[!grepl("obcs|freq|bas|gender|sample|bodysurv",names(Data))]
+
+# Boxplots
+source("data/Outlier_Detection.R")
+Barplots(Data[,PDRitems])
+
+#Pairs Plots
+jpeg("pairs.jpg", width=2200, height=2200)
+par(mfrow=c(length(PDRitems),length(PDRitems)))
+for(i in PDRitems){for(j in PDRitems){
+barplot(table(Data[,i], Data[,j]), main=paste(i,j))}}
+dev.off()
+
+```
+2. Missing Data
+    + Evaluate missingness patterns/Littles MNAR test/T test comparisons
+      - *‘Missing Data’ script*  
+```{r MissingData, eval=FALSE, echo=FALSE}
+source("data/Missing_Data.R")
+
+Missing_Subset=Data[,c("gender",PDRitems)]
+for(i in PDRitems){Missing_Subset[,i]=as.factor(sample(c(NA,1,2), 797, prob=c(0.1,0.45,0.45), replace=TRUE))}
+
+Missing_Subset=Data[,c("gender",PDRitems)]
+for(i in PDRitems){Missing_Subset[,i]=sample(c(NA,1,2), 797, prob=c(0.1,0.45,0.45), replace=TRUE)}
+
+MCAR_out=mcar(Missing_Subset[,PDRitems])
+
+t.test(gender~shoepain, data=Missing_Subset, var.equal=FALSE)
+
+Missing_Patterns(Missing_Subset)
+
+```
+3. Normality  
+    + Skew/Kurt/QQplot
+      - *‘Assumption Checking’ script*
+```{r AssumptionChecking, eval=FALSE, echo=FALSE}
+source("Assumption_Checking.R")
+SK_Data=sapply(Data[,PDRitems], SkewKurtosis)
+which(abs(SK_Data["Skew",])>2)
+which(abs(SK_Data["Kurtosis",])>2)
+
+QQplots(Data[,PDRitems])
+```
+
+    + Outlier detection
+      - Boxplot/zRange/plausible meanSD’s
+        + *‘Outlier Detection’ script*  
+```{r OutlierDetection, eval=FALSE, echo=FALSE}
+source("data/Outlier_Detection.R")
+
+boxplot(apply(Data[,PDRitems],1,sum,na.rm=T))
+
+zRange(apply(Data[,PDRitems],1,sum,na.rm=T))
+
+apply(Data[,PDRitems],2, meanSD)
+
+```
+
+3. Descriptives  
+    + Mean, Median, Standard Deviation, Frequency, Range
+      - *Base R: mean(), median(), sd(), table(), range())*
+```{r MeanMedianSDFreqRange, eval=FALSE, echo=FALSE}
+
+apply(Data[,PDRitems], 2, meanSD)
+
+apply(Data[,PDRitems], 2, median)
+
+sapply(Data[,PDRitems], table)
+
+sapply(Data[,PDRitems], table, Data$gender)
+
+range(apply(Data[,PDRitems], 1, sum))
+```
+    + Correlation matrix 
+      - *psych package: tetrachoric()*
+```{r CorMat, eval=FALSE, echo=FALSE}
+#install.packages("psych")
+library(psych)
+tetrachoric(Data[,PDRitems])$rho
+```
+
+    + Standardized Cronbach’s Alpha
+      - *psych package: alpha()*    
+```{r Alpha, eval=FALSE, echo=FALSE}
+alpha(Data[,PDRitems])$total$std.alpha
+```
+
+## Replication of paper analyses
+  
+1. Dimensionality
+    + Scree plots
+      - *psych package: fa.parallel()*
+```{r ScreePlots, eval=FALSE, echo=FALSE}
+plot(fa.parallel(Data[,PDRitems])$fa.values)
+```
+    + ICLUST
+      - *psych package: ICLUST()*
+```{r ICLUST, eval=FALSE, echo=FALSE}
+ICLUST(tetrachoric(Data[,PDRitems])$rho)
+```
+
+    + Bi-factor modeling
+      - *psych package: omega()*  
+```{r Omega, eval=FALSE, echo=FALSE}
+omega(tetrachoric(Data[,PDRitems])$rho)
+```
+
+*review of dimensionality analyses results alongside items and literature review to qualitative guide decision on number of factors to included or modelled*
+  
+2. IRT Assumption Checks  
+	*Will need to be further fleshed out for which model is selected*
+    + Monotonicity
+          - *assumed for dichotomous data*
+      - Unidimensionality
+        + Omega hierarchical/total & Explained Common Variance
+          - *psych package: omega()*
+```{r OmegaHOmegaTotECV, eval=FALSE, echo=FALSE}
+omega(tetrachoric(Data[,PDRitems])$rho)[c("omega_h", "omega.tot", "ECV")]
+```
+      - Local dependence 
+        + *Rasch: Q3*
+        + *2pl: jackknife slope index – Q3  for rasch*
+      - Item invariance (DIF)
+        + *Rasch: Mantel-Haenszel*
+        + *2PL: logistic ordinal regression for 2pl?*
+3. IRT Modeling
+    + Models to be evaluated: 
+      - Rasch 
+        - *psych package: rasch()* 
+      - Rasch w/guessing 
+        - *???psych package: rasch()* 
+      - 2PL 
+        - *psych package: ltm()* 
+      - Multidimensional IRT 
+        - *mirt package: mirt()* 
+      - IRTree Modeling 
+        - *???? package: ???()* 
+      - Explanatory IRT Modeling 
+        - *???? package: ???()* 
+    + Model fit
+      - Goodness of fit/deviance 
+        - *Package: AIC,BIC, Chi-Sq?*
+    + Item fit
+      - Infit/outfit/signed chisq
+        - *Package: TBD*  
+  
 ## What are the criteria for confirming and disconfirming the hypotheses?
+  
+### Hypothesis 1  
+There is either a unidimensional or multidimensional construct of ‘discomfort/distraction for appearance’ as measured by the PDR clothing items?  
+  
+**Confirming**  
+1. There is additional literature supporting a construct of ‘discomfort/distraction for appearance’ as indicated by wearing PDR clothing.  
+2. Scree plots, ICLUST and Bifactor analyses indicate a reasonable number of factors (1 to 5) in the PDR clothing set
+  
+**Disconfirming**  
+1. There is additional literature contradicting a construct of ‘discomfort/distraction for appearance’ as indicated by wearing PDR clothing.  
+2. Scree plots, ICLUST and Bifactor analyses indicate an unreasonable or untestable number of factors (e.g., 6+) in the PDR clothing set
+  
+### Hypothesis 2  
+An Item Response Theory model can be fit to the dimensions in the PDR clothing item data, and will allow further evaluation and comparison of PDR clothing items in relation to the central construct(s) of ‘discomfort/distraction for appearance’.  
+  
+**Confirming**  
+1. Model assumptions will be met for each IRT model to be fit, including monotonicity, local dependence and item invariance  
+2. Goodness of fit indices for the model is appropriate (e.g., CFI/TLI >0.95, RMSEA <0.08) and for item fit (e.g., non-significant signed chi-square)  
+  
+**Disconfirming**  
+1. Model assumptions are not met for each IRT model to be fit, including monotonicity, local dependence and item invariance  
+2. Goodness of fit indices for the model are not appropriate (e.g., CFI/TLI <0.95, RMSEA >0.08) and item fit (e.g., significant signed chi-square)  
 
 ## Have the analyses been validated on a subset of the data?
 
+The analyses have not been validated on a subset of the data 
+
 ## What is known about the data that could be relevant for the tested hypotheses?
 
+Original publication introducing the PDR item displayed high internal consistency (cronbach’s alpha >0.9) and group-level differences between gender.
+
 ## Please provide a brief timeline for the different steps in the preregistration?
+
+Planning and writing for the preregistration started in October, 2021. Data was simulated based on the codebook published on OSF [https://osf.io/ajv5z/](https://osf.io/ajv5z/) in November, 2021 and published on GitHub under a branch of the "Prereg_Function" project, called "ClothingIRT" - (https://github.com/zenit125/Prereg_Functions/tree/Clothing_IRT). Set-up and hypothesis building will completed in December with results of additional literature review and simulated data/coding embedded in this parent RMarkdown document. The actual research below is planned for completion in December 2021.
+  
+Hypothesis 1 will be tested after completion of the set-up and hypothesis building. The results of Hypothesis 1 will be posted in an expanded version of this RMarkdown document.  
+  
+Based on the results of Hypothesis 1 and any requisite additional background research, revisions to Hypothesis 2, coding and results will occur and will be documented in this parent RMarkdown document. 
