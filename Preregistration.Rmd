@@ -3,6 +3,7 @@ title: "PDR Clothing and Item Response Theory"
 subtitle: "Preregistration"
 author: "Robert Chapman"
 date: "12/04/2021"
+
 output: word_document
 ---
 
